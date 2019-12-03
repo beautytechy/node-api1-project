@@ -43,7 +43,7 @@ server.post("/api/users", (req, res) => {
     db.insert(userData)
         .then(user => {
             console.log(user)
-            if (user.name && user.bio) {
+            if (user) {
                 res
                     .status(201).json(userData);
 
@@ -81,8 +81,9 @@ server.delete("/api/users/:id", (req, res) => {
 })
 
 server.put("/api/users/:id", (req, res) => {
+    const id = req.params.id;
     const userData = req.body; //express does not know how to parse JSON
-    db.update(user.id, userData)
+    db.update(id, userData)
         .then(user => {
             console.log(user)
             if (user.name && user.bio) {
@@ -93,6 +94,9 @@ server.put("/api/users/:id", (req, res) => {
                 res
                     .status(404)
                     .json({ errorMessage: "The user with the specified ID does not exist." })
+            } if (user.id) {
+                res.status(400)
+                    .json({ errorMessage: "Please provide name and bio for the user." })
             }
         })
         .catch(error => {
