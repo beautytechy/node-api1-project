@@ -39,13 +39,13 @@ server.get("/api/users/:id", (req, res) => {
 });
 
 server.post("/api/users", (req, res) => {
-    const userData = req.body; //express does not know how to parse JSON
+    const userData = req.body;
     db.insert(userData)
         .then(user => {
             console.log(user)
-            if (user) {
+            if (user.name && user.bio) {
                 res
-                    .status(201).json(userData);
+                    .status(201).json({userData});
 
             } else {
                 res
@@ -65,10 +65,11 @@ server.delete("/api/users/:id", (req, res) => {
     const id = req.params.id;
     db.remove(id)
         .then(removed => {
+            console.log(removed)
             if (removed) {
-                res.status(404).json({ message: "The user with the specified ID does not exist." })
+                res.status(200).json({ message: "User deleted" })
             } else {
-                res.status(200).json({ message: "user deleted" })
+                res.status(404).json({ message: "The user with the specified ID does not exist." })
             }
         })
 
@@ -82,19 +83,19 @@ server.delete("/api/users/:id", (req, res) => {
 
 server.put("/api/users/:id", (req, res) => {
     const id = req.params.id;
-    const userData = req.body; //express does not know how to parse JSON
+    const userData = req.body;
     db.update(id, userData)
         .then(user => {
             console.log(user)
-            if (user.name && user.bio) {
+            if (user.id && user.name && user.bio) {
                 res
                     .status(200).json(userData);
 
-            } else {
+            } else if(id) {
                 res
                     .status(404)
                     .json({ errorMessage: "The user with the specified ID does not exist." })
-            } if (user.id) {
+            } else {
                 res.status(400)
                     .json({ errorMessage: "Please provide name and bio for the user." })
             }
